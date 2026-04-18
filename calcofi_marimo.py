@@ -43,11 +43,9 @@ def _():
 
 @app.cell
 def _(mo, pd):
-    df = pd.read_csv('194903-202105_Bottle.csv', low_memory=False, encoding='latin1')
-    df['Year'] = df['Depth_ID'].str.split('-').str[1].str[:2].astype(float)
-    df['Year'] = df['Year'].apply(lambda x: 1900 + x if x >= 49 else 2000 + x)
-    mo.md(f"**Loaded:** {df.shape[0]:,} rows | Years: {int(df['Year'].min())}–{int(df['Year'].max())}")
-    return (df,)
+    df_map = pd.read_csv('calcofi_processed.csv', low_memory=False)
+    mo.md(f"**Loaded:** {df_map.shape[0]:,} rows | Ready for analysis")
+    return
 
 
 @app.cell

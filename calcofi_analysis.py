@@ -197,3 +197,6 @@ fig5 = px.scatter_mapbox(
 )
 fig5.update_layout(mapbox_style='carto-positron')
 fig5.show()
+# ── SAVE PROCESSED DATA ──────────────────────────────────────
+df_map.to_csv('calcofi_processed.csv', index=False)
+print("Saved calcofi_processed.csv")
