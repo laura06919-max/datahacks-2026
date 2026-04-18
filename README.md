@@ -61,13 +61,14 @@ Scripps Institution of Oceanography, UC San Diego
 ---
 
 ## Project Structure
+```
 datahacks-2026/
 ├── calcofi_analysis.py      # ML pipeline — data loading, labeling, training
 ├── calcofi_marimo.py        # Marimo interactive notebook
 ├── docs/                    # Sphinx documentation
 │   └── build/html/          # Generated HTML docs
 └── README.md
-
+```
 ---
 
 ## Data Source
