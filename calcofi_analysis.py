@@ -165,3 +165,35 @@ fig4.show()
 
 print("\nAll done! 4 charts generated.")
 print("Charts: oxygen dist, health over time, feature importance, health by depth")
+# ── 13. CHART 5 — Geographic health map ──────────────────────
+print("Loading cast file for lat/lon...")
+cast = pd.read_csv('194903-202105_Cast.csv', low_memory=False, encoding='latin1')
+cast = cast[['Sta_ID', 'Lat_Dec', 'Lon_Dec']].dropna()
+
+# Merge lat/lon into df_clean using Sta_ID
+df_clean['Sta_ID'] = df['Sta_ID'].loc[df_clean.index]
+df_map = df_clean.merge(cast.drop_duplicates('Sta_ID'), on='Sta_ID', how='left')
+df_map = df_map.dropna(subset=['Lat_Dec', 'Lon_Dec'])
+
+print(f"Map dataframe: {df_map.shape[0]:,} rows with coordinates")
+
+# Sample 10k points so the map loads fast
+map_df = df_map.sample(10000, random_state=42)
+
+fig5 = px.scatter_mapbox(
+    map_df,
+    lat='Lat_Dec',
+    lon='Lon_Dec',
+    color='health_label',
+    color_discrete_map={
+        'Healthy': '#2ecc71',
+        'Stressed': '#f39c12',
+        'Critical': '#e74c3c'
+    },
+    zoom=4,
+    height=600,
+    title='California Current Ecosystem Health Map',
+    hover_data=['T_degC', 'O2ml_L', 'NO3uM']
+)
+fig5.update_layout(mapbox_style='carto-positron')
+fig5.show()
