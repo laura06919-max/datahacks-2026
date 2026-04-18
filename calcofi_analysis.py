@@ -105,7 +105,7 @@ fig1 = px.histogram(df_clean, x='O2ml_L', color='health_label',
                     title='Oxygen Distribution by Health Class',
                     color_discrete_map={
                         'Healthy': '#2ecc71',
-                        'Stressed': '#f39c12',
+                        'Stressed': '#3498db',
                         'Critical': '#e74c3c'
                     },
                     nbins=80, barmode='overlay', opacity=0.7)
@@ -123,7 +123,7 @@ fig2 = px.area(trend, x='Year', y='Count', color='health_label',
                title='California Ocean Health 1949-2021',
                color_discrete_map={
                    'Healthy': '#2ecc71',
-                   'Stressed': '#f39c12',
+                   'Stressed': '#3498db',
                    'Critical': '#e74c3c'
                })
 fig2.update_layout(xaxis_title='Year', yaxis_title='Sample Count')
@@ -157,7 +157,7 @@ fig4 = px.bar(depth_health, x='Depth_Zone', y='Count',
               barmode='group',
               color_discrete_map={
                   'Healthy': '#2ecc71',
-                  'Stressed': '#f39c12',
+                  'Stressed': '#3498db',
                   'Critical': '#e74c3c'
               })
 fig4.update_layout(xaxis_title='Depth Zone', yaxis_title='Sample Count')
@@ -187,7 +187,7 @@ fig5 = px.scatter_mapbox(
     color='health_label',
     color_discrete_map={
         'Healthy': '#2ecc71',
-        'Stressed': '#f39c12',
+        'Stressed': '#3498db',
         'Critical': '#e74c3c'
     },
     zoom=4,
