@@ -1,17 +1,39 @@
-.. DataHacks2026 documentation master file, created by
-   sphinx-quickstart on Fri Apr 17 21:30:02 2026.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-DataHacks2026 documentation
-===========================
-
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+DataHacks 2026 — Ocean Pulse
+=============================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
+   overview
+   methodology
+   results
+   modules
+
+Overview
+--------
+Ocean Pulse is a machine learning project built at DataHacks 2026 using 
+70 years of real oceanographic data from the Scripps Institution of 
+Oceanography (CalCOFI program, 1949–2021).
+
+We classify California Current ecosystem health into three states 
+(Healthy, Stressed, and Critical), using a Random Forest classifier 
+trained on water chemistry measurements.
+
+**Team:** Ocean Pulse (Laura, Chau, David, Maggie)  
+**Track:** Machine Learning / AI  
+**Dataset:** CalCOFI Hydrographic Bottle Database (Scripps)  
+**Model Accuracy:** 98%
+
+Key Findings
+------------
+- Phosphate and nitrate are the strongest predictors of ocean health
+- Critical hypoxic zones worsen significantly below 300m depth
+- Stressed conditions have increased since the 1980s
+- Ocean health can be predicted from nutrients alone and no oxygen sensor are needed
+
+Data Source
+-----------
+California Cooperative Oceanic Fisheries Investigations (CalCOFI)  
+Scripps Institution of Oceanography, UC San Diego  
+https://calcofi.org
