@@ -207,13 +207,15 @@ k4.metric("🚨 Critical", f"{counts.get('Critical',0)/total:.1%}",
 
 st.markdown("---")
 
-tab1,tab2,tab3,tab4,tab5,tab6 = st.tabs([
+tab7,tab1,tab2,tab3,tab4,tab5,tab6,tab8 = st.tabs([
+    "📡 Data Sources & Forecast",
     "🔍 Live Predictor",
     "📈 Health Over Time",
     "🗺️ Geographic Map",
     "🌊 Depth Analysis",
     "🦐 Zooplankton",
     "🤖 Model Insights",
+    "🌎 Regional Policy Advisor",
 ])
 
 
@@ -332,9 +334,9 @@ with tab2:
         line=dict(color='#2ecc71', width=3),
     ))
     fig_pct.update_layout(**DARK,
-                          title="% Healthy Samples (5-year rolling average)",
-                          yaxis=dict(tickformat=".0%", gridcolor="#1a3050"),
-                          xaxis=dict(gridcolor="#1a3050"))
+                      title="% Healthy Samples (5-year rolling average)")
+    fig_pct.update_xaxes(tickformat="", gridcolor="#1a3050")
+    fig_pct.update_yaxes(tickformat=".0%", gridcolor="#1a3050")
     st.plotly_chart(fig_pct, use_container_width=True)
 
     st.markdown("**By decade**")
@@ -564,7 +566,310 @@ with tab6:
     )
     st.plotly_chart(fig_cm, use_container_width=True)
 
+# ════════════════════════════════════════════════════════════════
+# TAB 7  ·  DATA SOURCES & FORECAST
+# ════════════════════════════════════════════════════════════════
+with tab7:
+    st.markdown("### 📡 Get Ocean Data For Your Location")
+    st.markdown("""
+    Enter your location and we'll fetch the nearest real ocean measurements 
+    and run them through our model automatically.
+    """)
 
+    # ── Location Input ────────────────────────────────────────
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        location_input = st.text_input(
+            "Enter a city, zip code, or coastal location:",
+            placeholder="e.g. San Diego, CA  or  La Jolla  or  92037"
+        )
+    with col2:
+        radius_km = st.slider("Search radius (km)", 50, 500, 200)
+
+    # Location → lat/lon mapping for California coastal cities
+    LOCATION_COORDS = {
+        # San Diego area
+        'san diego': (32.72, -117.15),
+        'la jolla': (32.85, -117.27),
+        '92037': (32.85, -117.27),
+        '92101': (32.72, -117.17),
+        '92109': (32.77, -117.23),
+        # LA area
+        'los angeles': (33.95, -118.40),
+        'santa monica': (34.02, -118.50),
+        'long beach': (33.77, -118.19),
+        'malibu': (34.03, -118.78),
+        # Central CA
+        'santa barbara': (34.42, -119.70),
+        'monterey': (36.60, -121.89),
+        'big sur': (36.27, -121.81),
+        'san luis obispo': (35.28, -120.66),
+        # Northern CA
+        'san francisco': (37.75, -122.45),
+        'half moon bay': (37.46, -122.43),
+        'bodega bay': (38.33, -123.05),
+        'eureka': (40.80, -124.16),
+    }
+
+    if location_input:
+        # Try to match location
+        loc_key = location_input.lower().strip()
+        matched_coords = None
+
+        for key, coords in LOCATION_COORDS.items():
+            if key in loc_key or loc_key in key:
+                matched_coords = coords
+                matched_name = key.title()
+                break
+
+        if matched_coords is None:
+            st.warning(f"Location '{location_input}' not recognized. Try a California coastal city like 'San Diego', 'Monterey', or 'San Francisco'.")
+        else:
+            lat, lon = matched_coords
+            st.success(f"📍 Found: **{matched_name}** ({lat:.2f}°N, {abs(lon):.2f}°W)")
+
+            # Show nearby historical data from our dataset
+            st.markdown("#### Nearby Ocean Samples From Our Dataset")
+
+            # Filter by approximate location
+            lat_range = radius_km / 111
+            lon_range = radius_km / 85
+
+            nearby = df[
+                (df['Lat_Dec'].between(lat - lat_range, lat + lat_range)) &
+                (df['Lon_Dec'].between(lon - lon_range, lon + lon_range))
+            ].copy()
+
+            if len(nearby) == 0:
+                st.warning("No samples found in this area. Try increasing the search radius.")
+            else:
+                st.info(f"Found **{len(nearby):,}** historical samples within {radius_km}km of {matched_name}")
+
+                # Show recent samples
+                recent_nearby = nearby[nearby['Year'] >= 2015].copy()
+                if len(recent_nearby) == 0:
+                    recent_nearby = nearby.tail(100)
+
+                # Average measurements
+                avg_measurements = recent_nearby[ML_FEATURES].mean()
+
+                st.markdown("#### Average Recent Measurements For This Area")
+                metric_cols = st.columns(4)
+                metric_cols[0].metric("🌡️ Temperature", f"{avg_measurements['T_degC']:.1f}°C")
+                metric_cols[1].metric("🧂 Salinity", f"{avg_measurements['Salnty']:.2f} PSU")
+                metric_cols[2].metric("🔵 Phosphate", f"{avg_measurements['PO4uM']:.2f} µM")
+                metric_cols[3].metric("🟢 Nitrate", f"{avg_measurements['NO3uM']:.1f} µM")
+
+                # Auto-predict using average measurements
+                pred_input = pd.DataFrame([avg_measurements[ML_FEATURES]])
+                pred = model.predict(pred_input)[0]
+                proba = model.predict_proba(pred_input)[0]
+                color = HEALTH_COLORS[pred]
+                emoji = HEALTH_EMOJI[pred]
+
+                st.markdown("#### Model Prediction For This Location")
+                st.markdown(f"""
+                <div class="predict-result" style="background:{color}22;
+                     border:2px solid {color};margin:.5rem 0">
+                  <div style="font-size:3rem">{emoji}</div>
+                  <div style="font-size:1.8rem;font-weight:700;color:{color};
+                              font-family:'Space Mono',monospace">{pred}</div>
+                  <div style="color:#cfe8ff;margin-top:.5rem">
+                    Based on {len(recent_nearby):,} nearby samples
+                    (2015–2021)
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Probability bars
+                for cls, prob in sorted(zip(model.classes_, proba), key=lambda x: -x[1]):
+                    c = HEALTH_COLORS[cls]
+                    st.markdown(
+                        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">'
+                        f'<span style="width:80px">{cls}</span>'
+                        f'<div style="flex:1;background:#1a3050;border-radius:4px;height:13px">'
+                        f'<div style="width:{prob*100:.1f}%;background:{c};border-radius:4px;height:13px"></div>'
+                        f'</div><span style="width:45px;text-align:right;font-family:monospace">{prob:.1%}</span></div>',
+                        unsafe_allow_html=True
+                    )
+
+                # Map of nearby samples
+                st.markdown("#### Nearby Sample Locations")
+                fig_nearby = px.scatter_mapbox(
+                    recent_nearby.dropna(subset=['Lat_Dec','Lon_Dec']).sample(
+                        min(2000, len(recent_nearby)), random_state=42),
+                    lat='Lat_Dec', lon='Lon_Dec',
+                    color='health_label',
+                    color_discrete_map=HEALTH_COLORS,
+                    zoom=7, height=400,
+                    title=f'Ocean Health Near {matched_name}',
+                    hover_data=['T_degC','O2ml_L','NO3uM','Year']
+                )
+                fig_nearby.update_layout(
+                    mapbox_style='carto-darkmatter',
+                    paper_bgcolor="#040d17",
+                    font=dict(color="#cfe8ff"),
+                    margin=dict(l=0,r=0,t=40,b=0)
+                )
+                st.plotly_chart(fig_nearby, use_container_width=True)
+
+                # Health trend for this location
+                st.markdown("#### Health Trend For This Area Over Time")
+                loc_trend = nearby.groupby(['Year','health_label']).size().reset_index(name='Count')
+                loc_trend['Year'] = loc_trend['Year'].astype(int)
+                fig_loc = px.area(loc_trend, x='Year', y='Count', color='health_label',
+                                  color_discrete_map=HEALTH_COLORS,
+                                  title=f'Ocean Health Trend Near {matched_name}')
+                fig_loc.update_layout(**DARK)
+                st.plotly_chart(fig_loc, use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("### 🔮 Future Projection")
+    target_year = st.slider("Project ocean conditions to year:", 2022, 2040, 2026)
+
+    if st.button("🔮 Generate Projection"):
+        with st.spinner("Computing historical trends..."):
+            recent = df[df['Year'] >= 2000].copy()
+            trend_rows = []
+
+            for feat in ML_FEATURES:
+                yearly = recent.groupby('Year')[feat].mean().reset_index().dropna()
+                if len(yearly) > 3:
+                    slope, intercept = np.polyfit(yearly['Year'], yearly[feat], 1)
+                    projected = slope * target_year + intercept
+                    last_known = yearly[feat].iloc[-1]
+                    change_pct = ((projected - last_known) / abs(last_known) * 100) if last_known != 0 else 0
+                    trend_rows.append({
+                        'Feature': feat,
+                        'Last Known (2021)': round(last_known, 3),
+                        'Annual Change': round(slope, 4),
+                        f'Projected ({target_year})': round(projected, 3),
+                        'Change %': round(change_pct, 1)
+                    })
+
+            trend_df = pd.DataFrame(trend_rows)
+            st.dataframe(trend_df.set_index('Feature'), use_container_width=True)
+
+            synthetic = {r['Feature']: r[f'Projected ({target_year})']
+                        for _, r in trend_df.iterrows()}
+            synthetic_df = pd.DataFrame([synthetic])
+            pred  = model.predict(synthetic_df[ML_FEATURES])[0]
+            proba = model.predict_proba(synthetic_df[ML_FEATURES])[0]
+            color = HEALTH_COLORS[pred]
+            emoji = HEALTH_EMOJI[pred]
+
+            st.markdown(f"""
+            <div class="predict-result" style="background:{color}22;
+                 border:2px solid {color};margin-top:1rem">
+              <div style="font-size:3rem">{emoji}</div>
+              <div style="font-size:1.8rem;font-weight:700;color:{color};
+                          font-family:'Space Mono',monospace">{pred}</div>
+              <div style="color:#cfe8ff;margin-top:.5rem">
+                Projected for <strong>{target_year}</strong> | 
+                Confidence: {max(proba):.1%}
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+# ════════════════════════════════════════════════════════════════
+# TAB 8  ·  REGIONAL POLICY ADVISOR
+# ════════════════════════════════════════════════════════════════
+with tab8:
+    st.markdown("### 🌎 Regional Ocean Health & Government Action Advisor")
+    st.markdown("""
+    Select a California coastal region to see its health summary
+    and get AI-powered policy recommendations from our LLM.
+    """)
+
+    def assign_region(lat):
+        if lat >= 38.0:
+            return "Northern California (SF & Above)"
+        elif lat >= 35.0:
+            return "Central California (Monterey / Big Sur)"
+        elif lat >= 32.5:
+            return "Southern California (LA / San Diego)"
+        else:
+            return "Baja California Border Zone"
+
+    df['Region'] = df['Lat_Dec'].apply(assign_region)
+
+    region_summary = df.groupby('Region').agg(
+        Avg_Temperature=('T_degC', 'mean'),
+        Avg_Oxygen=('O2ml_L', 'mean'),
+        Avg_Nitrate=('NO3uM', 'mean'),
+        Avg_Phosphate=('PO4uM', 'mean'),
+        Sample_Count=('O2ml_L', 'count'),
+        Critical_Pct=('health_label', lambda x: (x == 'Critical').mean() * 100),
+        Stressed_Pct=('health_label', lambda x: (x == 'Stressed').mean() * 100),
+        Healthy_Pct=('health_label', lambda x: (x == 'Healthy').mean() * 100),
+    ).round(2).reset_index()
+
+    selected = st.selectbox(
+        "Select a California coastal region:",
+        region_summary['Region'].tolist()
+    )
+
+    row = region_summary[region_summary['Region'] == selected].iloc[0]
+
+    r1, r2, r3, r4 = st.columns(4)
+    r1.metric("Avg Temperature", f"{row['Avg_Temperature']:.1f}°C")
+    r2.metric("Avg Oxygen", f"{row['Avg_Oxygen']:.2f} ml/L")
+    r3.metric("Critical %", f"{row['Critical_Pct']:.1f}%")
+    r4.metric("Stressed %", f"{row['Stressed_Pct']:.1f}%")
+
+    # Region health trend chart
+    region_df = df[df['Region'] == selected]
+    reg_trend = region_df.groupby(['Year','health_label']).size().reset_index(name='Count')
+    reg_trend['Year'] = reg_trend['Year'].astype(int)
+    fig_reg = px.area(reg_trend, x='Year', y='Count', color='health_label',
+                      color_discrete_map=HEALTH_COLORS,
+                      title=f'Ocean Health Trend — {selected}')
+    fig_reg.update_layout(**DARK)
+    st.plotly_chart(fig_reg, use_container_width=True)
+
+    # Groq policy recommendation
+    st.markdown("#### AI Policy Recommendations")
+    if st.button("🤖 Get Policy Recommendations"):
+        try:
+            from groq import Groq
+            groq_client = Groq(api_key="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")
+
+            dominant = 'Critical' if row['Critical_Pct'] > 30 else \
+                       'Stressed' if row['Stressed_Pct'] > 40 else 'Healthy'
+
+            prompt = f"""
+You are an ocean policy advisor for the state of California.
+You are specifically analyzing the {selected} coastal region.
+
+Average measurements:
+- Temperature: {row['Avg_Temperature']}°C
+- Dissolved Oxygen: {row['Avg_Oxygen']} ml/L
+- Nitrate: {row['Avg_Nitrate']} µM
+- Phosphate: {row['Avg_Phosphate']} µM
+- Critical samples: {row['Critical_Pct']}%
+- Stressed samples: {row['Stressed_Pct']}%
+
+Provide exactly three sections:
+
+**CURRENT SITUATION IN {selected.upper()}:**
+2-3 sentences on what these measurements mean for marine life.
+
+**IF NO ACTION IS TAKEN:**
+2-3 sentences on consequences in 10-20 years.
+
+**RECOMMENDED GOVERNMENT ACTIONS:**
+3 specific actions for California agencies (Coastal Commission, EPA, 
+Water Board) specific to this region's geography and industries.
+"""
+            with st.spinner("Consulting AI policy advisor..."):
+                response = groq_client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                advice = response.choices[0].message.content
+                st.markdown(advice)
+
+        except Exception as e:
+            st.error(f"API error: {e}")
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("---")
 st.markdown(
