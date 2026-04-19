@@ -86,6 +86,11 @@ MARIMO_OUTPUT_MAX_BYTES=10000000 marimo edit calcofi_marimo.py
 ```
 streamlit run streamlit_app-3.py
 ```
+**View Sphinx Documentation:**
+Open `docs/build/html/index.html` in your browser, or run:
+```
+open docs/build/html/index.html
+```
 ---
 
 ## Data Source
