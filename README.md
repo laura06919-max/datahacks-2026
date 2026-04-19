@@ -91,8 +91,12 @@ Open `docs/build/html/index.html` in your browser, or run:
 ```
 open docs/build/html/index.html
 ```
+**Interactive website:**
+```
+https://laura06919-max.github.io/datahacks-2026/
+```
 ---
-
+ 
 ## Data Source
 
 California Cooperative Oceanic Fisheries Investigations (CalCOFI)  
