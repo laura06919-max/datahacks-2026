@@ -550,8 +550,8 @@ with tab7:
     col1, col2 = st.columns([2, 1])
     with col1:
         location_input = st.text_input(
-            "Enter a city, zip code, or coastal location:",
-            placeholder="e.g. San Diego, CA  or  La Jolla  or  92037"
+            "Enter a city, or coastal location:",
+            placeholder="e.g. San Diego, CA  or  La Jolla"
         )
     with col2:
         radius_km = st.slider("Search radius (km)", 50, 500, 200)
