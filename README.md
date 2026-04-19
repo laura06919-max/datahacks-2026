@@ -1,5 +1,3 @@
-# datahacks-2026
-DataHacks 2026 - ML/AI &amp; Data Analytics
 # 🌊 Ocean Pulse — DataHacks 2026
 
 **Team:** Ocean Pulse | Laura · Chau · David · Maggie  
@@ -32,8 +30,7 @@ ecosystem into three states:
 - **Model:** Random Forest Classifier
 - **Accuracy:** 98%
 - **Training samples:** 286,819
-- **Key finding:** Phosphate and nitrate are the strongest predictors 
-  of ocean health — oxygen stress can be inferred from nutrients alone
+- **Key finding:** Phosphate and nitrate are the strongest predictors of ocean health — oxygen stress can be inferred from nutrients alone
 
 ---
 
@@ -61,14 +58,31 @@ Scripps Institution of Oceanography, UC San Diego
 ---
 
 ## Project Structure
-```
+'''
 datahacks-2026/
 ├── calcofi_analysis.py      # ML pipeline — data loading, labeling, training
 ├── calcofi_marimo.py        # Marimo interactive notebook
+├── streamlit_app-3.py       # Interactive web dashboard
 ├── docs/                    # Sphinx documentation
 │   └── build/html/          # Generated HTML docs
 └── README.md
-```
+'''
+---
+
+## How To Run
+
+**ML Pipeline:**
+'''
+python3 calcofi_analysis.py
+'''
+**Interactive Marimo Notebook:**
+'''
+MARIMO_OUTPUT_MAX_BYTES=10000000 marimo edit calcofi_marimo.py
+'''
+**Streamlit Dashboard:**
+'''
+streamlit run streamlit_app-3.py
+'''
 ---
 
 ## Data Source

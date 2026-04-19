@@ -207,14 +207,14 @@ k4.metric("🚨 Critical", f"{counts.get('Critical',0)/total:.1%}",
 
 st.markdown("---")
 
-tab7,tab1,tab2,tab3,tab4,tab6,tab8 = st.tabs([
+tab7,tab1,tab8,tab2,tab3,tab4,tab6 = st.tabs([
     "📡 Data Sources & Forecast",
     "🔍 Live Predictor",
+    "🌎 Regional Policy Advisor",
     "📈 Health Over Time",
     "🗺️ Geographic Map",
     "🌊 Depth Analysis",
     "🤖 Model Insights",
-    "🌎 Regional Policy Advisor",
 ])
 
 
