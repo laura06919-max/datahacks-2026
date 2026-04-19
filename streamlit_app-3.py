@@ -207,13 +207,12 @@ k4.metric("🚨 Critical", f"{counts.get('Critical',0)/total:.1%}",
 
 st.markdown("---")
 
-tab7,tab1,tab2,tab3,tab4,tab5,tab6,tab8 = st.tabs([
+tab7,tab1,tab2,tab3,tab4,tab6,tab8 = st.tabs([
     "📡 Data Sources & Forecast",
     "🔍 Live Predictor",
     "📈 Health Over Time",
     "🗺️ Geographic Map",
     "🌊 Depth Analysis",
-    "🦐 Zooplankton",
     "🤖 Model Insights",
     "🌎 Regional Policy Advisor",
 ])
@@ -427,63 +426,6 @@ with tab4:
                        annotation_text="4.0")
     fig_hist.update_layout(**DARK)
     st.plotly_chart(fig_hist, use_container_width=True)
-
-
-# ════════════════════════════════════════════════════════════════
-# TAB 5  ·  ZOOPLANKTON
-# ════════════════════════════════════════════════════════════════
-with tab5:
-    st.markdown("### 🦐 Zooplankton Biological Signal")
-    st.caption(f"{len(zoo)} tow samples · Jan 2023 · California coast · "
-               "Source: NOAA ERDDAP `erdCalCOFIzoovol`")
-
-    z1, z2 = st.columns(2)
-
-    with z1:
-        fig_zmap = px.scatter_mapbox(
-            zoo.dropna(subset=['latitude','longitude']),
-            lat='latitude', lon='longitude',
-            color='plankton_density', size='total_plankton',
-            color_continuous_scale='Blues',
-            zoom=6, height=400,
-            title='Zooplankton Density (Jan 2023)',
-            hover_data=['volume_sampled','small_plankton','total_plankton'],
-            size_max=20,
-        )
-        fig_zmap.update_layout(
-            mapbox_style='carto-darkmatter',
-            paper_bgcolor="#040d17",
-            font=dict(color="#cfe8ff"),
-            margin=dict(l=0,r=0,t=40,b=0),
-        )
-        st.plotly_chart(fig_zmap, use_container_width=True)
-
-    with z2:
-        fig_zbar = px.bar(
-            zoo.sort_values('total_plankton', ascending=False),
-            x='station', y='total_plankton',
-            color='plankton_density', color_continuous_scale='Blues',
-            title='Total Plankton by Station',
-            labels={'total_plankton':'Total Plankton (ml/1000m³)',
-                    'station':'Station'},
-        )
-        fig_zbar.update_layout(**DARK)
-        st.plotly_chart(fig_zbar, use_container_width=True)
-
-    fig_zsc = px.scatter(
-        zoo, x='total_plankton', y='small_plankton',
-        color='plankton_density', color_continuous_scale='Blues',
-        title='Small vs Total Plankton',
-        labels={'total_plankton':'Total (ml/1000m³)',
-                'small_plankton':'Small (ml/1000m³)'},
-        trendline='ols',
-    )
-    fig_zsc.update_layout(**DARK)
-    st.plotly_chart(fig_zsc, use_container_width=True)
-
-    st.info("💡 These 29 tows are from Jan 2023. Once Chau's full zooplankton "
-            "fetch is complete, `plankton_density` and `small_fraction` "
-            "will be added as model features for extra biological signal.")
 
 
 # ════════════════════════════════════════════════════════════════
