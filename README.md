@@ -58,7 +58,8 @@ Scripps Institution of Oceanography, UC San Diego
 ---
 
 ## Project Structure
-'''
+
+```
 datahacks-2026/
 ├── calcofi_analysis.py      # ML pipeline — data loading, labeling, training
 ├── calcofi_marimo.py        # Marimo interactive notebook
@@ -66,23 +67,25 @@ datahacks-2026/
 ├── docs/                    # Sphinx documentation
 │   └── build/html/          # Generated HTML docs
 └── README.md
-'''
+```
 ---
 
 ## How To Run
 
 **ML Pipeline:**
-'''
+```
 python3 calcofi_analysis.py
-'''
+```
+
 **Interactive Marimo Notebook:**
-'''
+```
 MARIMO_OUTPUT_MAX_BYTES=10000000 marimo edit calcofi_marimo.py
-'''
+```
+
 **Streamlit Dashboard:**
-'''
+```
 streamlit run streamlit_app-3.py
-'''
+```
 ---
 
 ## Data Source
