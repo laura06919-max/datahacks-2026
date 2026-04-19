@@ -9,7 +9,7 @@
 ## Project Overview
 
 The California Current is one of the most productive marine ecosystems 
-on Earth — but decades of climate change, ocean acidification, and 
+on Earth. However, after decades of climate change, ocean acidification, and 
 warming waters are pushing it toward a tipping point.
 
 Using **70 years of real oceanographic data** from the Scripps Institution 
@@ -30,7 +30,7 @@ ecosystem into three states:
 - **Model:** Random Forest Classifier
 - **Accuracy:** 98%
 - **Training samples:** 286,819
-- **Key finding:** Phosphate and nitrate are the strongest predictors of ocean health — oxygen stress can be inferred from nutrients alone
+- **Key finding:** Phosphate and nitrate are the strongest predictors of ocean health. Therefore, oxygen stress can be inferred from nutrients alone
 
 ---
 
