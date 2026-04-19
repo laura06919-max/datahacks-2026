@@ -284,7 +284,6 @@ def _(df_map, px):
 
 @app.cell
 def _(df_map, mo, plt, sns):
-    import pandas as pd
     corr = df_map[['T_degC', 'Salnty', 'O2ml_L', 'NO3uM', 'PO4uM', 'Depthm']].corr()
     fig_corr, ax = plt.subplots(figsize=(8, 6))
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", ax=ax)
@@ -293,7 +292,7 @@ def _(df_map, mo, plt, sns):
     plt.savefig('correlation_heatmap.png')
     plt.close()
     mo.image(src="correlation_heatmap.png")
-    return (pd,)
+    return
 
 
 @app.cell
@@ -367,7 +366,7 @@ def _(df_map, mo):
 
 @app.cell
 def _(Groq, mo, os, region_dropdown, region_summary):
-    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY", "YOUR_KEY_HERE"))
+    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY", "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"))
 
     def region_action_advisor(region_name, avg_stats, dominant_health):
         prompt = f"""
