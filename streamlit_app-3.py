@@ -223,7 +223,7 @@ tab7,tab1,tab8,tab2,tab3,tab4,tab6 = st.tabs([
 # ════════════════════════════════════════════════════════════════
 with tab1:
     st.markdown("### 🔍 Classify Any Water Sample in Real Time")
-    st.caption("Sliders use real value ranges from 895k CalCOFI bottle samples.")
+    st.markdown("Sliders use real value ranges from 895k CalCOFI bottle samples.")
 
     sl, sr = st.columns([1,1], gap="large")
 
@@ -304,18 +304,24 @@ uses temperature, salinity, nutrients, depth, and chlorophyll only.
 # ════════════════════════════════════════════════════════════════
 with tab2:
     st.markdown("### 📈 California Current Health 1949–2021")
-    st.caption(f"{total:,} samples across {int(df['Year'].max()-df['Year'].min())} years")
+    st.markdown(f"{total:,} samples across {int(df['Year'].max()-df['Year'].min())} years")
 
     trend = (df.groupby(['Year','health_label'])
                .size().reset_index(name='Count'))
     trend['Year'] = trend['Year'].astype(int)
 
     fig_area = px.area(trend, x='Year', y='Count', color='health_label',
-                       color_discrete_map=HEALTH_COLORS,
-                       title="Sample Health Distribution Over Time",
-                       labels={"Count":"Bottle Samples"})
+                   color_discrete_map=HEALTH_COLORS,
+                   title="Sample Health Distribution Over Time",
+                   labels={"Count":"Bottle Samples"})
     fig_area.update_layout(**DARK, legend_title="Status")
     st.plotly_chart(fig_area, use_container_width=True)
+
+    st.markdown(
+        "Track how ocean health has evolved from 1949 to today. "
+        "Each line shows how many samples fall into healthy, stressed, "
+        "or critical conditions each year."
+    )
 
     pct = (df.groupby('Year')
              .apply(lambda x: (x['health_label']=='Healthy').mean())
@@ -337,6 +343,11 @@ with tab2:
     fig_pct.update_xaxes(tickformat="", gridcolor="#1a3050")
     fig_pct.update_yaxes(tickformat=".0%", gridcolor="#1a3050")
     st.plotly_chart(fig_pct, use_container_width=True)
+    
+    st.markdown(
+    "Track the share of healthy ocean samples over time. "
+    "Dots show yearly values, while the line highlights the overall trend."
+    )
 
     st.markdown("**By decade**")
     dec = df.copy()
@@ -355,7 +366,7 @@ with tab2:
 # ════════════════════════════════════════════════════════════════
 with tab3:
     st.markdown("### 🗺️ Where Is the Ocean Under Stress?")
-    st.caption("Lat/lon approximated from CalCOFI line·station codes (Sta_ID)")
+    st.markdown("Lat/lon approximated from CalCOFI line·station codes (Sta_ID)")
 
     yr_min, yr_max = int(df['Year'].min()), int(df['Year'].max())
     yr_sel = st.slider("Filter by year range", yr_min, yr_max, (1990, 2021))
@@ -364,7 +375,7 @@ with tab3:
                 .query("@yr_sel[0] <= Year <= @yr_sel[1]")
                 .sample(min(15000, len(df)), random_state=42))
 
-    st.caption(f"Showing {len(map_df):,} samples")
+    st.markdown(f"Showing {len(map_df):,} samples")
 
     fig_map = px.scatter_mapbox(
         map_df, lat='Lat_Dec', lon='Lon_Dec',
@@ -401,17 +412,29 @@ with tab4:
         fig_dh.update_layout(**DARK)
         st.plotly_chart(fig_dh, use_container_width=True)
 
+        st.markdown(
+            "See how ecosystem health varies across ocean depths. "
+            "Surface waters are mostly healthy, but as you go deeper, "
+            "stressed and critical conditions become more common."
+        )
+
     with c2:
         o2d = df.groupby('Depth_Zone', observed=True)['O2ml_L'].mean().reset_index()
         fig_o2d = px.bar(o2d, x='Depth_Zone', y='O2ml_L',
-                         title='Mean Dissolved O₂ by Depth Zone',
-                         color='O2ml_L', color_continuous_scale='RdYlGn')
+                        title='Mean Dissolved O₂ by Depth Zone',
+                        color='O2ml_L', color_continuous_scale='RdYlGn')
         fig_o2d.add_hline(y=1.4, line_dash="dash", line_color="#e74c3c",
-                          annotation_text="Hypoxia 1.4 ml/L")
+                        annotation_text="Hypoxia 1.4 ml/L")
         fig_o2d.add_hline(y=4.0, line_dash="dash", line_color="#f39c12",
-                          annotation_text="Stressed 4.0 ml/L")
+                        annotation_text="Stressed 4.0 ml/L")
         fig_o2d.update_layout(**DARK)
         st.plotly_chart(fig_o2d, use_container_width=True)
+
+        st.markdown(
+            "Explore how oxygen levels change with depth. "
+            "Lower oxygen at deeper levels can lead to stressed or even hypoxic "
+            "(low-oxygen) conditions for marine life."
+        )
 
     fig_hist = px.histogram(
         df, x='O2ml_L', color='health_label',
@@ -421,11 +444,16 @@ with tab4:
         labels={'O2ml_L':'Dissolved Oxygen (ml/L)'},
     )
     fig_hist.add_vline(x=1.4, line_dash="dash", line_color="#e74c3c",
-                       annotation_text="1.4")
+                    annotation_text="1.4")
     fig_hist.add_vline(x=4.0, line_dash="dash", line_color="#f39c12",
-                       annotation_text="4.0")
+                    annotation_text="4.0")
     fig_hist.update_layout(**DARK)
     st.plotly_chart(fig_hist, use_container_width=True)
+    st.markdown(
+        "Explore how dissolved oxygen levels relate to ecosystem health. "
+        "Lower oxygen levels are strongly linked to stressed and critical "
+        "conditions for marine life."
+    )
 
 
 # ════════════════════════════════════════════════════════════════
