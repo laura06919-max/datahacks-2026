@@ -37,3 +37,19 @@ Data Source
 California Cooperative Oceanic Fisheries Investigations (CalCOFI)  
 Scripps Institution of Oceanography, UC San Diego  
 https://calcofi.org
+
+Usage
+-----
+To run the full pipeline::
+
+   python3 calcofi_analysis.py
+
+To launch the interactive Marimo notebook::
+
+   MARIMO_OUTPUT_MAX_BYTES=10000000 marimo edit calcofi_marimo.py
+
+Requirements
+------------
+Install dependencies::
+
+   pip install pandas numpy scikit-learn plotly marimo sphinx groq seaborn matplotlib xgboost
