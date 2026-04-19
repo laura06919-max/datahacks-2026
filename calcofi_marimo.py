@@ -20,17 +20,28 @@ def _():
     from sklearn.metrics import classification_report
     from groq import Groq
     warnings.filterwarnings('ignore')
-    return (mo, pd, np, px, pickle, os, sns, plt,
-            RandomForestClassifier, train_test_split, classification_report, Groq)
+    return (
+        Groq,
+        RandomForestClassifier,
+        classification_report,
+        mo,
+        os,
+        pd,
+        pickle,
+        plt,
+        px,
+        sns,
+        train_test_split,
+    )
 
 
 @app.cell
 def _(mo):
     mo.md("""
     # California Ocean Ecosystem Health Classifier
-    **Team:** Ocean Pulse | Laura · Chau · David · Maggie  
-    **Event:** DataHacks 2026 @ UC San Diego  
-    **Dataset:** CalCOFI Hydrographic Bottle Database — Scripps Institution of Oceanography (1949–2021)  
+    **Team:** Ocean Pulse | Laura · Chau · David · Maggie
+    **Event:** DataHacks 2026 @ UC San Diego
+    **Dataset:** CalCOFI Hydrographic Bottle Database — Scripps Institution of Oceanography (1949–2021)
     **Model:** Random Forest Classifier | **Accuracy:** 98%
 
     Using 70 years of real oceanographic data to classify and explain
@@ -40,7 +51,7 @@ def _(mo):
 
 
 @app.cell
-def _(pd, mo):
+def _(mo, pd):
     df_map = pd.read_csv('calcofi_processed.csv', low_memory=False)
 
     def assign_region(lat):
@@ -55,7 +66,7 @@ def _(pd, mo):
 
     df_map['Region'] = df_map['Lat_Dec'].apply(assign_region)
     mo.md(f"**Loaded:** {df_map.shape[0]:,} rows | Regions: {df_map['Region'].value_counts().to_dict()}")
-    return df_map, assign_region
+    return (df_map,)
 
 
 @app.cell
@@ -95,7 +106,7 @@ def _(df_map, mo):
     - Stressed: {dist.get('Stressed', 0):,} samples
     - Critical: {dist.get('Critical', 0):,} samples
     """)
-    return dist,
+    return
 
 
 @app.cell
@@ -116,7 +127,7 @@ def _(mo):
     no3_stressed = mo.ui.slider(5.0, 50.0, value=20.0, step=1.0,
                                  label="Stressed Nitrate threshold (µM)")
     mo.vstack([o2_critical, o2_stressed, no3_stressed])
-    return o2_critical, o2_stressed, no3_stressed
+    return
 
 
 @app.cell
@@ -136,7 +147,7 @@ def _(mo):
 
 
 @app.cell
-def _(df_map, RandomForestClassifier, train_test_split, classification_report, pickle, mo):
+def _(RandomForestClassifier, df_map, mo, pickle, train_test_split):
     ml_features = ['T_degC', 'Salnty', 'PO4uM', 'NO3uM', 'NO2uM', 'Depthm', 'ChlorA']
 
     df_model = df_map[ml_features + ['health_label']].dropna()
@@ -155,11 +166,11 @@ def _(df_map, RandomForestClassifier, train_test_split, classification_report, p
         pickle.dump(rf, f)
 
     mo.md("**Model trained and saved!** ✓")
-    return ml_features, df_model, X, y, X_train, X_test, y_train, y_test, rf, y_pred
+    return ml_features, rf, y_pred, y_test
 
 
 @app.cell
-def _(y_test, y_pred, classification_report, mo):
+def _(classification_report, mo, y_pred, y_test):
     report = classification_report(y_test, y_pred, output_dict=True)
     mo.md(f"""
     ## Model Performance
@@ -172,12 +183,14 @@ def _(y_test, y_pred, classification_report, mo):
 
     **Overall Accuracy: {report['accuracy']:.2%}**
     """)
-    return report,
+    return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Visualizations")
+    mo.md("""
+    ## Visualizations
+    """)
     return
 
 
@@ -193,11 +206,11 @@ def _(df_map, px):
                             'Critical': '#e74c3c'
                         })
     fig_trend
-    return trend, fig_trend
+    return
 
 
 @app.cell
-def _(rf, ml_features, pd, px):
+def _(ml_features, pd, px, rf):
     importances = pd.Series(rf.feature_importances_, index=ml_features).sort_values(ascending=False)
     imp_df = importances.reset_index()
     imp_df.columns = ['Feature', 'Importance']
@@ -207,11 +220,11 @@ def _(rf, ml_features, pd, px):
                      color_continuous_scale='RdYlGn')
     fig_imp.update_layout(showlegend=False)
     fig_imp
-    return importances, imp_df, fig_imp
+    return
 
 
 @app.cell
-def _(df_map, px):
+def _(df_map, pd, px):
     df_clean_depth = df_map.copy()
     df_clean_depth['Depth_Zone'] = pd.cut(
         df_clean_depth['Depthm'],
@@ -231,7 +244,7 @@ def _(df_map, px):
                            'Critical': '#e74c3c'
                        })
     fig_depth
-    return df_clean_depth, depth_health, fig_depth
+    return
 
 
 @app.cell
@@ -251,7 +264,7 @@ def _(df_map, px):
     )
     fig_map.update_layout(mapbox_style='carto-positron')
     fig_map
-    return map_df, fig_map
+    return
 
 
 @app.cell
@@ -266,12 +279,11 @@ def _(df_map, px):
     )
     fig_region_map.update_layout(mapbox_style='carto-positron')
     fig_region_map
-    return fig_region_map,
+    return
 
 
 @app.cell
-def _(df_map, sns, plt, mo):
-    import pandas as pd
+def _(df_map, mo, plt, sns):
     corr = df_map[['T_degC', 'Salnty', 'O2ml_L', 'NO3uM', 'PO4uM', 'Depthm']].corr()
     fig_corr, ax = plt.subplots(figsize=(8, 6))
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", ax=ax)
@@ -280,7 +292,7 @@ def _(df_map, sns, plt, mo):
     plt.savefig('correlation_heatmap.png')
     plt.close()
     mo.image(src="correlation_heatmap.png")
-    return corr, fig_corr, ax
+    return
 
 
 @app.cell
@@ -298,7 +310,7 @@ def _(df_map, px):
         points=False, template="plotly_white"
     )
     fig_box
-    return fig_box,
+    return
 
 
 @app.cell
@@ -316,7 +328,7 @@ def _(df_map, px):
         template="plotly_white"
     )
     fig_nitrate
-    return fig_nitrate,
+    return
 
 
 @app.cell
@@ -349,12 +361,12 @@ def _(df_map, mo):
         value=region_summary['Region'].tolist()[0]
     )
     region_dropdown
-    return region_summary, region_dropdown
+    return region_dropdown, region_summary
 
 
 @app.cell
-def _(region_summary, region_dropdown, Groq, os, mo):
-    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY", "YOUR_KEY_HERE"))
+def _(Groq, mo, os, region_dropdown, region_summary):
+    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY", "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"))
 
     def region_action_advisor(region_name, avg_stats, dominant_health):
         prompt = f"""
@@ -418,7 +430,7 @@ def _(region_summary, region_dropdown, Groq, os, mo):
 
     {advice}
     """)
-    return groq_client, region_action_advisor, selected_region, dominant, advice
+    return
 
 
 @app.cell
