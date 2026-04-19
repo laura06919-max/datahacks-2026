@@ -370,31 +370,32 @@ def _(Groq, mo, os, region_dropdown, region_summary):
 
     def region_action_advisor(region_name, avg_stats, dominant_health):
         prompt = f"""
-        You are an ocean policy advisor for the state of California.
+You are an ocean policy advisor for the state of California.
 
-        Region: {region_name}
-        Average ocean measurements:
-        - Temperature: {avg_stats['Avg_Temperature']}°C
-        - Dissolved Oxygen: {avg_stats['Avg_Oxygen']} ml/L
-        - Nitrate: {avg_stats['Avg_Nitrate']} µM
-        - Phosphate: {avg_stats['Avg_Phosphate']} µM
-        - Dominant health status: {dominant_health}
-        - Critical samples: {avg_stats['Critical_Pct']}%
-        - Stressed samples: {avg_stats['Stressed_Pct']}%
+You are specifically analyzing the **{region_name}** coastal region.
 
-        Provide a structured response with exactly these three sections:
+This region's average ocean measurements show:
+- Temperature: {avg_stats['Avg_Temperature']}°C
+- Dissolved Oxygen: {avg_stats['Avg_Oxygen']} ml/L
+- Nitrate: {avg_stats['Avg_Nitrate']} µM
+- Phosphate: {avg_stats['Avg_Phosphate']} µM
+- Dominant health status: {dominant_health}
+- Critical samples: {avg_stats['Critical_Pct']}%
+- Stressed samples: {avg_stats['Stressed_Pct']}%
 
-        **CURRENT SITUATION:**
-        2-3 sentences on what these measurements mean for marine life right now.
+Based SPECIFICALLY on the conditions in {region_name}, provide:
 
-        **IF NO ACTION IS TAKEN:**
-        2-3 sentences on what happens in 10-20 years if conditions continue.
+**CURRENT SITUATION IN {region_name.upper()}:**
+2-3 sentences on what these measurements mean for marine life in this specific region.
 
-        **RECOMMENDED GOVERNMENT ACTIONS:**
-        List 3 specific actions that California state agencies
-        (Coastal Commission, EPA, Water Board) can take to improve conditions.
-        Keep actions concrete and jurisdiction-specific.
-        """
+**IF NO ACTION IS TAKEN IN {region_name.upper()}:**
+2-3 sentences on what happens in 10-20 years specific to this region.
+
+**RECOMMENDED ACTIONS FOR {region_name.upper()}:**
+List 3 specific actions that local California agencies can take 
+for THIS region specifically. Reference local geography, industries,
+and specific agencies responsible for this area.
+"""
         response = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}]
