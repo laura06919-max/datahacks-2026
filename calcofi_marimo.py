@@ -298,7 +298,7 @@ def _(df_map, mo, plt, sns):
 @app.cell
 def _(df_map, px):
     fig_box = px.box(
-        df_map[df_map["O2ml_L"] > 0],
+        df_map[df_map["O2ml_L"] > 0].sample(5000, random_state=42),
         x="health_label", y="O2ml_L",
         title="Oxygen Distribution Across Health Classes",
         color="health_label",
@@ -316,7 +316,7 @@ def _(df_map, px):
 @app.cell
 def _(df_map, px):
     fig_nitrate = px.box(
-        df_map[df_map["NO3uM"] <= 40],
+        df_map[df_map["NO3uM"] <= 40].sample(5000, random_state=42),
         x="health_label", y="NO3uM",
         color="health_label",
         title="Nitrate Levels by Ecosystem Health",
