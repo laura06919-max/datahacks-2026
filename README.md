@@ -1,5 +1,7 @@
 # 🌊 Ocean Pulse — DataHacks 2026
 
+> 🏆 **3rd Place — Machine Learning / AI Track** | DataHacks 2026 @ UC San Diego
+
 **Team:** Ocean Pulse | Laura · Chau · David · Maggie  
 **Track:** Machine Learning / AI  
 **Event:** DataHacks 2026 @ UC San Diego  
