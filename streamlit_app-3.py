@@ -801,7 +801,7 @@ with tab8:
     if st.button("🤖 Get Policy Recommendations"):
         try:
             from groq import Groq
-            groq_client = Groq(api_key="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")
+            groq_client = Groq(api_key="YOUR_GROQ_API_KEY")
 
             dominant = 'Critical' if row['Critical_Pct'] > 30 else \
                        'Stressed' if row['Stressed_Pct'] > 40 else 'Healthy'
