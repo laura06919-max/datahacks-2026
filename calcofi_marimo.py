@@ -366,7 +366,7 @@ def _(df_map, mo):
 
 @app.cell
 def _(Groq, mo, os, region_dropdown, region_summary):
-    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY", "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"))
+    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY", ""))
 
     def region_action_advisor(region_name, avg_stats, dominant_health):
         prompt = f"""
